@@ -1,5 +1,5 @@
 
-![workflow](https://github.com/jimmy1234jt/sem/actions/workflows/blank.yml/badge.svg)
+![Workflow for Group Project](https://github.com/jimmy1234jt/sem/actions/workflows/main.yml/badge.svg)
 
 [![LICENSE](https://img.shields.io/github/license/jimmy1234jt/sem.svg?style=flat-square)](https://github.com/jimmy1234jt/devops/blob/master/LICENSE)
 
