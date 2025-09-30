@@ -26,3 +26,4 @@ jobs:
         run: docker run --network se-methods --name devopscontainer se_methods
       - name: view logs
         run: docker logs devopscontainer
+#this is a test that everything is working
