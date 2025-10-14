@@ -1,5 +1,6 @@
 package com.napier.sem;
-
+import java.util.List;
+import java.util.Scanner;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoCollection;
@@ -9,22 +10,45 @@ public class App
 {
     public static void main(String[] args)
     {
-        // Connect to MongoDB
-        MongoClient mongoClient = new MongoClient("mongo-dbserver");
-        // Get a database - will create when we use it
-        MongoDatabase database = mongoClient.getDatabase("mydb");
-        // Get a collection from the database
-        MongoCollection<Document> collection = database.getCollection("test");
-        // Create a document to store
-        Document doc = new Document("name", "Kevin Sim")
-                .append("class", "DevOps")
-                .append("year", "2024")
-                .append("result", new Document("CW", 95).append("EX", 85));
-        // Add document to collection
-        collection.insertOne(doc);
+//        // Connect to MongoDB
+//        MongoClient mongoClient = new MongoClient("mongo-dbserver");
+//        // Get a database - will create when we use it
+//        MongoDatabase database = mongoClient.getDatabase("mydb");
+//        // Get a collection from the database
+//        MongoCollection<Document> collection = database.getCollection("test");
+//        // Create a document to store
+//        Document doc = new Document("name", "Kevin Sim")
+//                .append("class", "DevOps")
+//                .append("year", "2024")
+//                .append("result", new Document("CW", 95).append("EX", 85));
+//        // Add document to collection
+//        collection.insertOne(doc);
+//
+//        // Check document in collection
+//        Document myDoc = collection.find().first();
+//        System.out.println(myDoc.toJson());
+        Scanner scanner = new Scanner(System.in);
 
-        // Check document in collection
-        Document myDoc = collection.find().first();
-        System.out.println(myDoc.toJson());
+
+        String url = "jdbc:mysql://db:3306/world";
+        String user = "root";
+        String password = "root";
+
+        World world = new World();
+
+        System.out.print("Enter a continent (e.g. Asia, Europe): ");
+        String continent = scanner.nextLine();
+
+        List<Country> countries = world.getCountriesByContinent(continent);
+
+        if (countries.isEmpty()) {
+            System.out.println("No countries found for continent: " + continent);
+        } else {
+            System.out.printf("%-35s %15s%n", "Country", "Population");
+            System.out.println("--------------------------------------------------------");
+            for (Country c : countries) {
+                System.out.printf("%-35s %15d%n", c.getName(), c.getPopulation());
+            }
+        }
     }
 }
