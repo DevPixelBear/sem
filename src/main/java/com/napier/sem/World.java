@@ -1,4 +1,5 @@
 package com.napier.sem;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -6,40 +7,59 @@ import java.util.List;
 public class World {
     private Connection connection;
 
-    public World() {
-        String host = System.getenv("DB_HOST");
-        String port = System.getenv("DB_PORT");
-        String db = System.getenv("DB_NAME");
-        String user = System.getenv("DB_USER");
-        String password = System.getenv("DB_PASSWORD");
-
-        String url = "jdbc:mysql://" + host + ":" + port + "/" + db + "?useSSL=false&allowPublicKeyRetrieval=true";
-
+    // ✅ Connect to the MySQL database
+    public void connect() {
         try {
+            String url = "jdbc:mysql://localhost:3306/world?useSSL=false&allowPublicKeyRetrieval=true";
+            String user = "root";
+            String password = "root";
+
+
             connection = DriverManager.getConnection(url, user, password);
-            System.out.println("✅ Connected to MySQL at " + host + ":" + port);
+            System.out.println("✅ Connected to the database successfully.");
         } catch (SQLException e) {
-            System.err.println("❌ Database connection failed: " + e.getMessage());
+            System.out.println("❌ Database connection failed: " + e.getMessage());
+            connection = null;
         }
     }
 
-    // Method to get countries by continent, sorted by population
+    // ✅ Disconnect from database
+    public void disconnect() {
+        try {
+            if (connection != null && !connection.isClosed()) {
+                connection.close();
+                System.out.println("🔌 Disconnected from database.");
+            }
+        } catch (SQLException e) {
+            System.out.println("❌ Error closing connection: " + e.getMessage());
+        }
+    }
+
+    // ✅ Fetch countries by continent
     public List<Country> getCountriesByContinent(String continent) {
         List<Country> countries = new ArrayList<>();
-        String query = "SELECT Name, Population FROM country WHERE Continent = ? ORDER BY Population DESC";
 
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+        if (connection == null) {
+            System.out.println("❌ No database connection.");
+            return countries;
+        }
+
+        try {
+            String query = "SELECT Name, Population FROM country WHERE Continent = ?";
+            PreparedStatement stmt = connection.prepareStatement(query);
             stmt.setString(1, continent);
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                String name = rs.getString("Name");
-                int population = rs.getInt("Population");
-                countries.add(new Country(name, population));
+                // Use constructor directly since your Country class doesn’t have setters
+                Country c = new Country(rs.getString("Name"), rs.getInt("Population"));
+                countries.add(c);
             }
 
+            rs.close();
+            stmt.close();
         } catch (SQLException e) {
-            System.err.println("Error retrieving countries: " + e.getMessage());
+            System.out.println("❌ Query failed: " + e.getMessage());
         }
 
         return countries;
