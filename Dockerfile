@@ -6,7 +6,9 @@ RUN mvn clean package -DskipTests
 
 FROM openjdk:17
 WORKDIR /app
-COPY --from=builder /app/target/*.jar app.jar
+COPY target/*-jar-with-dependencies.jar app.jar
+ENTRYPOINT ["java", "-jar", "app.jar"]
+
 
 ENV DB_HOST=db
 ENV DB_PORT=3306
