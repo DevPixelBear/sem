@@ -8,7 +8,7 @@ public class App {
         Scanner scanner = new Scanner(System.in);
 
         World world = new World();
-        world.connect(); // ✅ make sure this exists now
+        world.connect(); //make sure this exists now
 
         System.out.print("Enter a continent (e.g. Asia, Europe): ");
         String continent = scanner.nextLine();
@@ -25,6 +25,6 @@ public class App {
             }
         }
 
-        world.disconnect(); // ✅ safely close connection
+        world.disconnect(); //safely close connection
     }
 }
