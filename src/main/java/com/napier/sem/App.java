@@ -23,6 +23,6 @@ public class App {
             }
         }
 
-        world.disconnect(); // ✅ safely close connection
+        world.disconnect(); //  safely close connection
     }
 }

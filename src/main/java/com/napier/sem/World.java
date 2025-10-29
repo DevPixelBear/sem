@@ -8,7 +8,7 @@ import java.util.List;
 public class World {
     private Connection connection;
 
-    // ✅ Connect to the MySQL database
+    // Connect to the MySQL database
     public void connect() {
         try {
             String url = "jdbc:mysql://db:3306/world?useSSL=false&allowPublicKeyRetrieval=true";
@@ -17,31 +17,31 @@ public class World {
 
 
             connection = DriverManager.getConnection(url, user, password);
-            System.out.println("✅ Connected to the database successfully.");
+            System.out.println(" Connected to the database successfully.");
         } catch (SQLException e) {
-            System.out.println("❌ Database connection failed: " + e.getMessage());
+            System.out.println("Database connection failed: " + e.getMessage());
             connection = null;
         }
     }
 
-    // ✅ Disconnect from database
+    // Disconnect from database
     public void disconnect() {
         try {
             if (connection != null && !connection.isClosed()) {
                 connection.close();
-                System.out.println("🔌 Disconnected from database.");
+                System.out.println("Disconnected from database.");
             }
         } catch (SQLException e) {
-            System.out.println("❌ Error closing connection: " + e.getMessage());
+            System.out.println(" Error closing connection: " + e.getMessage());
         }
     }
 
-    // ✅ Fetch countries by continent
+    //  Fetch countries by continent
     public List<Country> getCountriesByContinent(String continent) {
         List<Country> countries = new ArrayList<>();
 
         if (connection == null) {
-            System.out.println("❌ No database connection.");
+            System.out.println("No database connection.");
             return countries;
         }
 
@@ -60,7 +60,7 @@ public class World {
             rs.close();
             stmt.close();
         } catch (SQLException e) {
-            System.out.println("❌ Query failed: " + e.getMessage());
+            System.out.println(" Query failed: " + e.getMessage());
         }
 
         return countries;
