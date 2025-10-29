@@ -1,16 +1,10 @@
 services:
   db:
     #uses latest sql image
-    image: mysql:latest
-    container_name: world_db
-    environment:
-      #root user password
-      MYSQL_ROOT_PASSWORD: root
-      #creates a database called world when container is ran
-      MYSQL_DATABASE: world
-    volumes:
-      #this initialises the database by mounting our sql file database into the containers init directory
-      - ./db/world_db/world.sql:/docker-entrypoint-initdb.d/world.sql
+    build:
+      #directory containing the dockerfile(docker uses this as a build context)
+      context: db/.
+    container_name: db
     ports:
       - "3306:3306"
 
@@ -23,19 +17,7 @@ services:
     #makes sure that the container that has the database runs first before our code container
     depends_on:
       - db
-    environment:
-      DB_HOST: db
-      DB_PORT: 3306
-      DB_USER: root
-      DB_PASSWORD: root
-      DB_NAME: world
     ports:
       - "8080:8080"
 
-#needed to make mongo container to run
-  mongo:
-    image: mongo:latest
-    container_name: mongo-dbserver
-    ports:
-      - "27017:27017"
 

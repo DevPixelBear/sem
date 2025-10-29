@@ -1,5 +1,6 @@
 package com.napier.sem;
 
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,9 +11,9 @@ public class World {
     // ✅ Connect to the MySQL database
     public void connect() {
         try {
-            String url = "jdbc:mysql://localhost:3306/world?useSSL=false&allowPublicKeyRetrieval=true";
+            String url = "jdbc:mysql://db:3306/world?useSSL=false&allowPublicKeyRetrieval=true";
             String user = "root";
-            String password = "root";
+            String password = "example";
 
 
             connection = DriverManager.getConnection(url, user, password);

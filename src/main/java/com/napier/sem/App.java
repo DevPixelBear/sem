@@ -1,5 +1,4 @@
 package com.napier.sem;
-
 import java.util.List;
 import java.util.Scanner;
 
@@ -8,10 +7,9 @@ public class App {
         Scanner scanner = new Scanner(System.in);
 
         World world = new World();
-        world.connect(); // ✅ make sure this exists now
+        world.connect();
 
-        System.out.print("Enter a continent (e.g. Asia, Europe): ");
-        String continent = scanner.nextLine();
+        String continent = "Asia";
 
         List<Country> countries = world.getCountriesByContinent(continent);
 
