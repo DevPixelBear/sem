@@ -4,10 +4,13 @@ COPY pom.xml .
 COPY src ./src
 RUN mvn clean package -DskipTests
 
-FROM openjdk:17
+FROM amazoncorretto:17 as prod
+#adding my sql into the docker container
+RUN yum update -y && \
+    yum install -y mysql gss-ntlmssp
 WORKDIR /app
-COPY target/*-jar-with-dependencies.jar app.jar
-ENTRYPOINT ["java", "-jar", "app.jar"]
+#making sure it builds first by adding on a dependency since it was skipping it before for some reason
+COPY --from=builder app/target/*-jar-with-dependencies.jar app.jar
 
 
 ENV DB_HOST=db

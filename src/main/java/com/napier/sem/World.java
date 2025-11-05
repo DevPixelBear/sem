@@ -10,7 +10,7 @@ public class World {
     //Connect to the MySQL database
     public void connect() {
         try {
-            String url = "jdbc:mysql://localhost:3306/world?useSSL=false&allowPublicKeyRetrieval=true";
+            String url = "jdbc:mysql://db:3306/world";
             String user = "root";
             String password = "root";
 
@@ -59,7 +59,15 @@ public class World {
             rs.close();
             stmt.close();
         } catch (SQLException e) {
-            System.out.println("Query failed: " + e.getMessage());
+            System.out.println("" +
+                    "" +
+                    "" +
+                    "" +
+                    "" +
+                    "" +
+                    "" +
+                    "" +
+                    "Query failed: " + e.getMessage());
         }
 
         return countries;
