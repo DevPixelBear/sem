@@ -10,9 +10,10 @@ public class World {
     //Connect to the MySQL database
     public void connect() {
         try {
-            String url = "jdbc:mysql://db:3306/world";
+            String url = "jdbc:mysql://mysql-dbserver:3306/world?useSSL=false&allowPublicKeyRetrieval=true";
             String user = "root";
             String password = "root";
+
 
 
             connection = DriverManager.getConnection(url, user, password);

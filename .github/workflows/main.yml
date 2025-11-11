@@ -13,11 +13,21 @@ jobs:
         with:
           java-version: '17'
           distribution: 'adopt'
-      - name: Setup network
+      - name: Setup network and database
         run: |
           docker network create --driver bridge se-methods
-          docker pull mongo
-          docker run -d --name mongo-dbserver --network se-methods mongo
+          docker run -d --name mysql-dbserver \
+            --network se-methods \
+            -e MYSQL_ROOT_PASSWORD=root \
+            -e MYSQL_DATABASE=world \
+            -p 3306:3306 \
+            mysql:8.0
+          # Wait for MySQL to be ready
+          for i in {1..20}; do
+            docker exec mysql-dbserver mysql -uroot -pexample -e "SELECT 1" && break
+            echo "Waiting for database..."
+            sleep 5
+          done
       - name: Build with Maven
         run: mvn package
       - name: Build
