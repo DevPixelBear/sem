@@ -20,6 +20,6 @@ jobs:
       - name: Start Docker Compose
         run: docker compose up -d --build
       - name: view logs
-        run: docker logs devopscontainer
+        run: docker compose logs -f app
 
 #this is a test that everything is working (2)
