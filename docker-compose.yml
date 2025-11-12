@@ -53,8 +53,6 @@ services:
       DB_USER: root
       DB_PASSWORD: root
       DB_NAME: world
-    ports:
-      - "8080:8080"
     #entrypoint: ["tail", "-f", "/dev/null"]
 #    entrypoint: ["java", "-jar", "app.jar"]
 
