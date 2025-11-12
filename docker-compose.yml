@@ -37,6 +37,24 @@ services:
       DB_NAME: world
     ports:
       - "8080:8080"
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder
+    container_name: test
+    entrypoint: ["mvn", "test", "-Dtest=IntegrationIT"]
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: root
+      DB_NAME: world
+    ports:
+      - "8080:8080"
     #entrypoint: ["tail", "-f", "/dev/null"]
 #    entrypoint: ["java", "-jar", "app.jar"]
 
