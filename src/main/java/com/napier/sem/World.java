@@ -10,7 +10,9 @@ public class World {
     //Connect to the MySQL database
     public void connect() {
         try {
-            String url = "jdbc:mysql://db:3306/world";;
+            // add environment variables to create a dynamic connection
+            String host = System.getenv().getOrDefault("DB_HOST", "127.0.0.1");
+            String url = "jdbc:mysql://" + host + ":3306/world";
             String user = "root";
             String password = "root";
 

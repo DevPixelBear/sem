@@ -7,7 +7,7 @@ services:
     environment:
       #root user password
       MYSQL_ROOT_PASSWORD: root
-      #creates a database called world when container is ran
+      #creates a database called world when container is run
       MYSQL_DATABASE: world
 
     ports:
