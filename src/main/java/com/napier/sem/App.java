@@ -127,7 +127,7 @@ public class App {
 
     // Returns the first N elements from the given list
     // If N exceeds the list size, returns the full list instead
-    private static List<Country> limitList(List<Country> list, int n) {
+    public static List<Country> limitList(List<Country> list, int n) {
         if (list == null || list.isEmpty() || n >= list.size()) {
             return list;
         }
