@@ -21,19 +21,24 @@ public class UnitTest {
     void testLimitListFewerThanSize() {
         List<Country> limited = App.limitList(sampleCountries, 2);
         assertEquals(2, limited.size());
-        assertEquals("United States", limited.get(0).getCode());
-        assertEquals("Canada", limited.get(1).getCode());
+        assertEquals("United States", limited.get(0).getName());
+        assertEquals("Canada", limited.get(1).getName());
     }
 
     @Test
     void testLimitListMoreThanSize() {
         List<Country> limited = App.limitList(sampleCountries, 5);
         assertEquals(3, limited.size()); // returns full list if n > list size
+        // Ensure that the result list is the same size as the input list
+        assertEquals(sampleCountries.size(), limited.size());
     }
 
     @Test
     void testLimitListZero() {
         List<Country> limited = App.limitList(sampleCountries, 0);
+        assertNotNull(limited);
+        //return an empty list
+        assertTrue(limited.isEmpty());
         assertEquals(0, limited.size());
     }
 
