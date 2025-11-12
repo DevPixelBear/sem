@@ -38,6 +38,15 @@ public class World {
         }
     }
 
+    //asking if there is a connection there
+    public boolean isConnected() {
+        try {
+            return connection != null && !connection.isClosed();
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
     //Fetch countries by continent
 //    public List<Country> getCountriesByContinent(String continent) {
 //        List<Country> countries = new ArrayList<>();
