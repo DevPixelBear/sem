@@ -21,8 +21,8 @@ public class UnitTest {
     void testLimitListFewerThanSize() {
         List<Country> limited = App.limitList(sampleCountries, 2);
         assertEquals(2, limited.size());
-        assertEquals("United States", limited.get(0).getName());
-        assertEquals("Canada", limited.get(1).getName());
+        assertEquals("United States", limited.get(0).getCode());
+        assertEquals("Canada", limited.get(1).getCode());
     }
 
     @Test

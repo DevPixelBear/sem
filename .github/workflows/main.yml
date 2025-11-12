@@ -22,7 +22,7 @@ jobs:
       - name: view logs
         run: docker compose logs -f app
   UnitTests:
-    name: Unit Tests
+    name: UnitTest
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
@@ -35,7 +35,7 @@ jobs:
           java-version: '17'
           distribution: 'adopt'
       - name: Unit Tests
-        run: mvn -Dtest=com.napier.devops.AppTest test
+        run: mvn test
   IntegrationTests:
     name: Integration Tests
     runs-on: ubuntu-22.04
