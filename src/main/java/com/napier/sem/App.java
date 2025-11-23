@@ -22,6 +22,8 @@ public class App {
             System.out.println("4. Top N populated countries in the world");
             System.out.println("5. Top N populated countries in a continent");
             System.out.println("6. Top N populated countries in a region");
+            System.out.println("7. All cities in the world");
+            System.out.println("8. All cities in a country");
             System.out.println("0. Exit");
             System.out.print("Enter your choice: ");
 
@@ -79,6 +81,16 @@ public class App {
                     showCountries(limitList(world.getCountries("region", reg), topReg));
                     break;
 
+                case 7:
+                    showCities(world.getAllCities());
+                    break;
+
+                case 8:
+                    System.out.print("Enter a country name: ");
+                    String userInput = scanner.nextLine();
+                    showCities(world.getAllCitiesInCountry(userInput));
+                    break;
+
                 case 0:
                     // Clean exit
                     System.out.println("Exiting program...");
@@ -93,6 +105,24 @@ public class App {
 
         world.disconnect();
         scanner.close();
+    }
+
+    private static void showCities(List<City> cities) {
+        if (cities == null || cities.isEmpty()) {
+            System.out.println("No cities found.");
+            return;
+        }
+
+        System.out.printf("%-5s %-35s %-20s %-25s %-15s%n",
+                "ID" , "Name", "District", "Code", "Population");
+        System.out.println("----------------------------------------------------------------------------------------------");
+
+        for (City c : cities) {
+            System.out.printf("%-5s %-35s %-20s %-25s %-15d%n",
+                    c.getID(), c.getName(), c.getDistrict(), c.getCountryCode(), c.getPopulation());
+        }
+
+        System.out.println("\nTotal results: " + cities.size());
     }
 
     // Displays a list of Country objects in a formatted table

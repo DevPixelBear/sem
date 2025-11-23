@@ -1,7 +1,11 @@
 package com.napier.sem;
 
+import com.mysql.cj.protocol.Resultset;
+
+import javax.sql.rowset.CachedRowSet;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class World {
@@ -85,6 +89,38 @@ public class World {
 //        return countries;
 //    }
 
+    public List<City> getAllCities()
+    {
+        Object[] params = {};
+        String query = "SELECT * FROM city ORDER BY population DESC";
+        try {
+            ResultSet resultset = runQuery(query, params);
+            List<City> cities = buildCities(resultset);
+            return cities;
+        }
+        catch (SQLException e) {
+            System.err.println("failed: " + e.getMessage());
+            return null;
+        }
+    }
+
+    public List<City> getAllCitiesInCountry(String country)
+    {
+        String query = "SELECT * FROM city JOIN country ON city.countryCode = country.code WHERE country.name = ? ORDER BY city.population DESC";
+//        String query = "SELECT * FROM city JOIN country ON city.countryCode = country.code WHERE country.name = ?";
+        Object[] params = new Object[]{ country };
+        try {
+            ResultSet resultset = runQuery(query, params);
+            List<City> cities = buildCities(resultset);
+            return cities;
+        }
+        catch (SQLException e) {
+            System.err.println("failed: " + e.getMessage());
+            return null;
+        }
+    }
+
+
     public List<Country> getCountries(String type, String value) {
         String sql;
         Object[] params;
@@ -114,6 +150,42 @@ public class World {
         }
 
         return runCountryQuery(sql, params);
+    }
+
+    public List<City> buildCities (ResultSet rs) throws SQLException {
+
+        List<City> cities = new ArrayList<>();
+        while (rs.next()) {
+            cities.add(new City(
+
+                    rs.getInt("ID"),
+                    rs.getString("Name"),
+                    rs.getString("CountryCode"),
+                    rs.getString("District"),
+                    rs.getInt("Population")
+            ));
+        }
+
+
+        return cities;
+    }
+
+    private ResultSet runQuery (String query, Object[] params)
+    {
+
+
+        try{
+            PreparedStatement statement = connection.prepareStatement(query);
+            for (int i = 0; i < params.length; i++) {
+                statement.setObject(i + 1, params[i]);
+            }
+            ResultSet resultSet = statement.executeQuery();
+
+            return resultSet;
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private List<Country> runCountryQuery(String sql, Object... params) {
