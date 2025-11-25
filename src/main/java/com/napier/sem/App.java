@@ -22,8 +22,12 @@ public class App {
             System.out.println("4. Top N populated countries in the world");
             System.out.println("5. Top N populated countries in a continent");
             System.out.println("6. Top N populated countries in a region");
-            System.out.println("7. All cities in the world");
-            System.out.println("8. All cities in a country");
+            System.out.println("7. Top N populated cities in the world");
+            System.out.println("8. Top N populated cities in a continent");
+            System.out.println("9. Top N populated cities in a country");
+            System.out.println("10. Top N populated cities in a region");
+            System.out.println("11. All cities in the world");
+            System.out.println("12. All cities in a country");
             System.out.println("0. Exit");
             System.out.print("Enter your choice: ");
 
@@ -59,36 +63,72 @@ public class App {
                 case 4:
                     // Display the top N countries worldwide by population
                     System.out.print("Enter number of top countries: ");
-                    int topWorld = getInt(scanner);
-                    showCountries(limitList(world.getCountries("world", null), topWorld));
+                    int topCountriesInWorld = getInt(scanner);
+                    showCountries(limitList(world.getCountries("world", null), topCountriesInWorld));
                     break;
 
                 case 5:
                     // Display the top N countries in a given continent
                     System.out.print("Enter continent name (e.g. Europe): ");
-                    String cont = scanner.nextLine();
+                    String countryCont = scanner.nextLine();
                     System.out.print("Enter number of top countries: ");
                     int topCont = getInt(scanner);
-                    showCountries(limitList(world.getCountries("continent", cont), topCont));
+                    showCountries(limitList(world.getCountries("continent", countryCont), topCont));
                     break;
 
                 case 6:
                     // Display the top N countries in a given region
                     System.out.print("Enter region name (e.g. Caribbean): ");
-                    String reg = scanner.nextLine();
+                    String countryReg = scanner.nextLine();
                     System.out.print("Enter number of top countries: ");
-                    int topReg = getInt(scanner);
-                    showCountries(limitList(world.getCountries("region", reg), topReg));
+                    int topRegInCountry = getInt(scanner);
+                    showCountries(limitList(world.getCountries("region", countryReg), topRegInCountry));
                     break;
 
                 case 7:
-                    showCities(world.getAllCities());
+                    // Display the top N cities in the world
+                    System.out.print("Enter number of top cities: ");
+                    int topCitiesInWorld = getInt(scanner);
+                    showCities(limitList(world.getCities("world", null), topCitiesInWorld));
                     break;
 
                 case 8:
+                    // Display the top N cities in a given continent
+                    System.out.print("Enter continent name (e.g. Europe): ");
+                    String contCity = scanner.nextLine();
+                    System.out.print("Enter number of top cities: ");
+                    int topCitiesInContinent = getInt(scanner);
+                    showCities(limitList(world.getCities("continent", contCity), topCitiesInContinent));
+                    break;
+
+                case 9:
+                    // Display the top N cities in a given country
+                    System.out.print("Enter country name (e.g. France): ");
+                    String countryCity = scanner.nextLine();
+                    System.out.print("Enter number of top cities: ");
+                    int topCitiesInCountry = getInt(scanner);
+                    showCities(limitList(world.getCities("country", countryCity), topCitiesInCountry));
+                    break;
+
+                case 10:
+                    // Display the top N cities in a given region
+                    System.out.print("Enter region name (e.g. Caribbean): ");
+                    String regCity = scanner.nextLine();
+                    System.out.print("Enter number of top cities: ");
+                    int topCitiesInReg = getInt(scanner);
+                    showCities(limitList(world.getCities("region", regCity), topCitiesInReg));
+                    break;
+
+                case 11:
+                    // Display all cities in the world, in no particular order
+                    showCities(world.getCities("world", null));
+                    break;
+
+                case 12:
+                    // Display all countries in the world, in no particular order
                     System.out.print("Enter a country name: ");
                     String userInput = scanner.nextLine();
-                    showCities(world.getAllCitiesInCountry(userInput));
+                    showCities(world.getCities("country", userInput));
                     break;
 
                 case 0:
@@ -157,7 +197,7 @@ public class App {
 
     // Returns the first N elements from the given list
     // If N exceeds the list size, returns the full list instead
-    public static List<Country> limitList(List<Country> list, int n) {
+    public static <T> List<T> limitList(List<T> list, int n) {
         if (list == null || list.isEmpty() || n >= list.size()) {
             return list;
         }

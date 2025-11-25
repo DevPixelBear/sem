@@ -89,34 +89,50 @@ public class World {
 //        return countries;
 //    }
 
-    public List<City> getAllCities()
-    {
-        Object[] params = {};
-        String query = "SELECT * FROM city ORDER BY population DESC";
-        try {
-            ResultSet resultset = runQuery(query, params);
-            List<City> cities = buildCities(resultset);
-            return cities;
-        }
-        catch (SQLException e) {
-            System.err.println("failed: " + e.getMessage());
-            return null;
-        }
-    }
 
-    public List<City> getAllCitiesInCountry(String country)
-    {
-        String query = "SELECT * FROM city JOIN country ON city.countryCode = country.code WHERE country.name = ? ORDER BY city.population DESC";
-//        String query = "SELECT * FROM city JOIN country ON city.countryCode = country.code WHERE country.name = ?";
-        Object[] params = new Object[]{ country };
+    public List<City> getCities(String type, String value) {
+        String sql;
+        Object[] params;
+
+        switch (type.toLowerCase()) {
+            case "world":
+                sql = "SELECT * FROM city ORDER BY Population DESC";
+                params = new Object[]{};
+                break;
+
+            case "continent":
+                sql = "SELECT city.* FROM city " +
+                        "JOIN country ON city.CountryCode = country.Code " +
+                        "WHERE country.Continent = ? ORDER BY city.Population DESC";
+                params = new Object[]{ value };
+                break;
+
+            case "region":
+                sql = "SELECT city.* FROM city " +
+                        "JOIN country ON city.CountryCode = country.Code " +
+                        "WHERE country.Region = ? ORDER BY city.Population DESC";
+                params = new Object[]{ value };
+                break;
+
+            case "country":
+                sql = "SELECT city.* FROM city " +
+                        "JOIN country ON city.CountryCode = country.Code " +
+                        "WHERE country.Name = ? ORDER BY city.Population DESC";
+                params = new Object[]{ value };
+                break;
+
+            default:
+                System.err.println("Invalid type: " + type);
+                return new ArrayList<>();
+        }
+
         try {
-            ResultSet resultset = runQuery(query, params);
-            List<City> cities = buildCities(resultset);
-            return cities;
+            ResultSet resultset = runQuery(sql, params);
+            return buildCities(resultset);
         }
         catch (SQLException e) {
-            System.err.println("failed: " + e.getMessage());
-            return null;
+            System.err.println("Query failed: " + e.getMessage());
+            return new ArrayList<>();
         }
     }
 
@@ -170,6 +186,8 @@ public class World {
         return cities;
     }
 
+
+
     private ResultSet runQuery (String query, Object[] params)
     {
 
@@ -179,7 +197,8 @@ public class World {
             for (int i = 0; i < params.length; i++) {
                 statement.setObject(i + 1, params[i]);
             }
-            ResultSet resultSet = statement.executeQuery();
+            ResultSet resultSet;
+            resultSet = statement.executeQuery();
 
             return resultSet;
 
