@@ -1,12 +1,12 @@
 package com.napier.sem;
 
 import com.mysql.cj.protocol.Resultset;
-
+import java.util.ArrayList;
+import java.util.List;
 import javax.sql.rowset.CachedRowSet;
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+
 
 public class World {
     private Connection connection;
@@ -19,8 +19,6 @@ public class World {
             String url = "jdbc:mysql://" + host + ":3306/world";
             String user = "root";
             String password = "root";
-
-
 
             connection = DriverManager.getConnection(url, user, password);
             System.out.println("Connected to the database successfully.");
@@ -50,45 +48,6 @@ public class World {
             return false;
         }
     }
-
-    //Fetch countries by continent
-//    public List<Country> getCountriesByContinent(String continent) {
-//        List<Country> countries = new ArrayList<>();
-//
-//        if (connection == null) {
-//            System.out.println("No database connection.");
-//            return countries;
-//        }
-//
-//        try {
-//            String query = "SELECT Name, Population FROM country WHERE Continent = ?";
-//            PreparedStatement stmt = connection.prepareStatement(query);
-//            stmt.setString(1, continent);
-//            ResultSet rs = stmt.executeQuery();
-//
-//            while (rs.next()) {
-//                // Use constructor directly since your Country class doesn’t have setters
-//                Country c = new Country(rs.getString("Name"), rs.getInt("Population"));
-//                countries.add(c);
-//            }
-//
-//            rs.close();
-//            stmt.close();
-//        } catch (SQLException e) {
-//            System.out.println("" +
-//                    "" +
-//                    "" +
-//                    "" +
-//                    "" +
-//                    "" +
-//                    "" +
-//                    "" +
-//                    "Query failed: " + e.getMessage());
-//        }
-//
-//        return countries;
-//    }
-
 
     public List<City> getCities(String type, String value) {
         String sql;
@@ -221,6 +180,14 @@ public class World {
                         "FROM country WHERE Region = ? ORDER BY Population DESC";
                 params = new Object[]{ value };
                 break;
+            case "capital":
+                sql = """
+            SELECT city.* FROM city
+            JOIN country ON country.Capital = city.ID
+            ORDER BY city.Population DESC
+            LIMIT ?""";
+                params = new Object[]{ value };
+                break;
 
             default:
                 System.err.println("Invalid type: " + type);
@@ -247,6 +214,152 @@ public class World {
 
         return cities;
     }
+    // 1. Top N populated cities in a district
+    public List<City> getTopCitiesByDistrict(String district, int limit) throws SQLException {
+        String sql = """
+        SELECT * FROM city
+        WHERE District = ?
+        ORDER BY Population DESC
+        LIMIT ?""";
+
+        if (!isConnected()) connect();
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            stmt.setString(1, district);
+            stmt.setInt(2, limit);
+
+            ResultSet rs = stmt.executeQuery();
+            List<City> cities = new ArrayList<>();
+
+            while (rs.next()) {
+                cities.add(new City(
+                        rs.getInt("ID"),
+                        rs.getString("Name"),
+                        rs.getString("CountryCode"),
+                        rs.getString("District"),
+                        rs.getInt("Population")
+                ));
+            }
+            return cities;
+        }
+    }
+
+    // 2. Top N populated capital cities
+    public List<City> getTopNPopulatedCapitalCities(int N) throws SQLException {
+        String sql = """
+        SELECT city.* FROM city
+        JOIN country ON country.Capital = city.ID
+        ORDER BY city.Population DESC
+        LIMIT ?
+    """;
+
+        if (!isConnected()) connect();
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, N);
+            ResultSet rs = stmt.executeQuery();
+
+            List<City> cities = new ArrayList<>();
+            while (rs.next()) {
+                cities.add(new City(
+                        rs.getInt("ID"),
+                        rs.getString("Name"),
+                        rs.getString("CountryCode"),
+                        rs.getString("District"),
+                        rs.getInt("Population")
+                ));
+            }
+
+            return cities;
+        }
+    }
+
+
+    // 3. All capital cities sorted by population (worldwide)
+    public List<City> getAllCapitalCitiesByPopulation() throws SQLException {
+        String sql = """
+        SELECT city.* FROM city
+        JOIN country ON country.Capital = city.ID
+        ORDER BY city.Population DESC
+    """;
+
+        if (!isConnected()) connect();
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            List<City> cities = new ArrayList<>();
+            while (rs.next()) {
+                cities.add(new City(
+                        rs.getInt("ID"),
+                        rs.getString("Name"),
+                        rs.getString("CountryCode"),
+                        rs.getString("District"),
+                        rs.getInt("Population")
+                ));
+            }
+            return cities;
+        }
+    }
+    // 4. All capital cities in a continent sorted by population
+    public List<City> getCapitalCitiesByContinent(String continent) throws SQLException {
+        String sql = """
+        SELECT city.* FROM city
+        JOIN country ON country.Capital = city.ID
+        WHERE country.Continent = ?
+        ORDER BY city.Population DESC
+    """;
+
+        if (!isConnected()) connect();
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            stmt.setString(1, continent);
+            ResultSet rs = stmt.executeQuery();
+
+            List<City> cities = new ArrayList<>();
+            while (rs.next()) {
+                cities.add(new City(
+                        rs.getInt("ID"),
+                        rs.getString("Name"),
+                        rs.getString("CountryCode"),
+                        rs.getString("District"),
+                        rs.getInt("Population")
+                ));
+            }
+
+            return cities;
+        }
+    }
+    // 5. All capital cities in a region sorted by population
+    public List<City> getCapitalCitiesByRegion(String region) throws SQLException {
+        String sql = """
+        SELECT city.* FROM city
+        JOIN country ON country.Capital = city.ID
+        WHERE country.Region = ?
+        ORDER BY city.Population DESC
+        """;
+
+        if (!isConnected()) connect();
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, region);
+            ResultSet rs = stmt.executeQuery();
+            List<City> cities = new ArrayList<>();
+            while (rs.next()) {
+                cities.add(new City(
+                        rs.getInt("ID"),
+                        rs.getString("Name"),
+                        rs.getString("CountryCode"),
+                        rs.getString("District"),
+                        rs.getInt("Population")
+                ));
+            }
+
+            return cities;
+        }
+    }
+
 
     public List<PopulationStat> getPopulationStat(String type, String value) {
         String sql = "";

@@ -2,6 +2,8 @@ package com.napier.sem;
 
 import java.util.List;
 import java.util.Scanner;
+import java.sql.SQLException;
+
 
 public class App {
     public static void main(String[] args) {
@@ -26,16 +28,13 @@ public class App {
             System.out.println("8. Top N populated cities in a continent");
             System.out.println("9. Top N populated cities in a country");
             System.out.println("10. Top N populated cities in a region");
-            System.out.println("11. All cities in the world");
-            System.out.println("12. All cities in a country");
-            System.out.println("13. All cities in a region");
-            System.out.println("14. All cities in a district");
-            System.out.println("15. All cities in a continent");
-            System.out.println("16. Population of people in each continent (total, in cities, not in cities)");
-            System.out.println("17. Population of people in each region (total, in cities, not in cities)");
-            System.out.println("18. Population of people in each country (total, in cities, not in cities)");
-            System.out.println("19. Top N capital cities in a continent");
-            System.out.println("20. Top N capital cities in a region");
+            System.out.println("11. Top N populated cities in a given district");
+            System.out.println("12. Top N populated capital cities in the world");
+            System.out.println("13. All capital cities sorted by population (worldwide)");
+            System.out.println("14. All capital cities in a continent sorted by population");
+            System.out.println("15. All capital cities in a region sorted by population");
+            System.out.println("16. All cities in the world");
+            System.out.println("17. All cities in a country");
             System.out.println("0. Exit");
             System.out.print("Enter your choice: ");
 
@@ -71,7 +70,7 @@ public class App {
                 case 4:
                     // Display the top N countries worldwide by population
                     System.out.print("Enter number of top countries: ");
-                    int topCountriesInWorld = getInt(scanner);
+                    int topCountriesInWorld = Integer.parseInt(scanner.nextLine());
                     showCountries(limitList(world.getCountries("world", null), topCountriesInWorld));
                     break;
 
@@ -80,7 +79,7 @@ public class App {
                     System.out.print("Enter continent name (e.g. Europe): ");
                     String countryCont = scanner.nextLine();
                     System.out.print("Enter number of top countries: ");
-                    int topCont = getInt(scanner);
+                    int topCont = Integer.parseInt(scanner.nextLine());
                     showCountries(limitList(world.getCountries("continent", countryCont), topCont));
                     break;
 
@@ -89,7 +88,7 @@ public class App {
                     System.out.print("Enter region name (e.g. Caribbean): ");
                     String countryReg = scanner.nextLine();
                     System.out.print("Enter number of top countries: ");
-                    int topRegInCountry = getInt(scanner);
+                    int topRegInCountry = Integer.parseInt(scanner.nextLine());
                     showCountries(limitList(world.getCountries("region", countryReg), topRegInCountry));
                     break;
 
@@ -105,7 +104,7 @@ public class App {
                     System.out.print("Enter continent name (e.g. Europe): ");
                     String contCity = scanner.nextLine();
                     System.out.print("Enter number of top cities: ");
-                    int topCitiesInContinent = getInt(scanner);
+                    int topCitiesInContinent = Integer.parseInt(scanner.nextLine());
                     showCities(limitList(world.getCities("continent", contCity), topCitiesInContinent));
                     break;
 
@@ -114,7 +113,7 @@ public class App {
                     System.out.print("Enter country name (e.g. France): ");
                     String countryCity = scanner.nextLine();
                     System.out.print("Enter number of top cities: ");
-                    int topCitiesInCountry = getInt(scanner);
+                    int topCitiesInCountry = Integer.parseInt(scanner.nextLine());
                     showCities(limitList(world.getCities("country", countryCity), topCitiesInCountry));
                     break;
 
@@ -123,78 +122,91 @@ public class App {
                     System.out.print("Enter region name (e.g. Caribbean): ");
                     String regCity = scanner.nextLine();
                     System.out.print("Enter number of top cities: ");
-                    int topCitiesInReg = getInt(scanner);
+                    int topCitiesInReg = Integer.parseInt(scanner.nextLine());
                     showCities(limitList(world.getCities("region", regCity), topCitiesInReg));
                     break;
 
                 case 11:
+                    //the top N populated cities in a given district
+                    System.out.print("Enter district name (e.g. Osaka): ");
+                    String distCity = scanner.nextLine();
+                    System.out.print("Enter number of top cities: ");
+                    int topCitiesInDist = Integer.parseInt(scanner.nextLine());
+                    try {
+                        List<City> topCitiesDist= world.getTopCitiesByDistrict(distCity, topCitiesInDist);
+                        showCities(limitList(topCitiesDist, topCitiesInDist));
+                    }catch (SQLException e) {
+                        System.out.println("Database error: " + e.getMessage());
+                    }
+
+                    break;
+
+                case 12:
+                    //the top N populated capital cities in the world
+                    System.out.print("Enter number of top cities: ");
+                    int topCapCitiesInWorld = Integer.parseInt(scanner.nextLine());
+                    try {
+                        List<City> popCitiesNmb = world.getTopNPopulatedCapitalCities(topCapCitiesInWorld);
+                        showCities(limitList(popCitiesNmb,topCapCitiesInWorld));
+                    }catch (SQLException e) {
+                        System.out.println("Database error: " + e.getMessage());
+                    }
+
+                    break;
+                case 13:
+                    //All capital cities sorted by population (worldwide)
+                    try {
+                        List<City> capCitiespop = world.getAllCapitalCitiesByPopulation();
+                        showCities(capCitiespop);
+                    } catch (SQLException e) {
+                        System.out.println("Database error: " + e.getMessage());
+                    }
+
+
+                    break;
+                case 14:
+                    System.out.print("Enter continent name: ");
+                    String capContinent = scanner.nextLine();
+                    System.out.print("Enter number of top cities: ");
+                    int topCapCitiesCont = Integer.parseInt(scanner.nextLine());
+                    try {
+                        List<City> capContCities = world.getCapitalCitiesByContinent(capContinent);
+                        showCities(limitList(capContCities, topCapCitiesCont));
+                    }catch (SQLException e) {
+                        System.out.println("Database error: " + e.getMessage());
+                    }
+
+                    break;
+
+                case 15:
+                    //All capital cities in a region sorted by population
+                    System.out.print("Enter region name: ");
+                    String capRegion = scanner.nextLine();
+
+                    System.out.print("Enter number of top cities: ");
+                    int limit = Integer.parseInt(scanner.nextLine());
+
+                    try {
+                        List<City> cities = world.getCapitalCitiesByRegion(capRegion);
+                        showCities(limitList(cities, limit));
+                    } catch (SQLException e) {
+                        System.out.println("Database error: " + e.getMessage());
+                    }
+                    break;
+
+
+
+                case 16:
                     // Display all cities in the world, in no particular order
                     showCities(world.getCities("world", null));
                     break;
 
-                case 12:
-                    // Display all cities in a city
-                    System.out.print("Enter a country name: ");
-                    String countryUserInput = scanner.nextLine();
-                    showCities(world.getCities("country", countryUserInput));
-                    break;
-
-                case 13:
-                    //display all cities in a region
-                    System.out.print("Enter a region: ");
-                    String regionUserInput = scanner.nextLine();
-                    showCities(world.getCities("region", regionUserInput));
-                    break;
-
-                case 14:
-                    //display all cities in a district
-                    System.out.print("Enter a district: ");
-                    String districtUserInput = scanner.nextLine();
-                    showCities(world.getCities("district", districtUserInput));
-                    break;
-
-                case 15:
-                    //display all cities in a continent
-                    System.out.print("Enter a continent: ");
-                    String continentUserInput = scanner.nextLine();
-                    showCities(world.getCities("continent", continentUserInput));
-                    break;
-                case 16:
-                    // Population by continent (chosen by user)
-                    System.out.print("Enter continent name (e.g. Asia): ");
-                    String contPop = scanner.nextLine();
-                    printPopulationStat(world.getPopulationStat("continent", contPop));
-                    break;
-
                 case 17:
-                    // Population by region (chosen by user)
-                    System.out.print("Enter region name (e.g. Caribbean): ");
-                    String regPop = scanner.nextLine();
-                    printPopulationStat(world.getPopulationStat("region", regPop));
+                    // Display all countries in the world, in no particular order
+                    System.out.print("Enter a country name: ");
+                    String userInput = scanner.nextLine();
+                    showCities(world.getCities("country", userInput));
                     break;
-
-                case 18:
-                    // Population by country (chosen by user)
-                    System.out.print("Enter country name (e.g. France): ");
-                    String countryPop = scanner.nextLine();
-                    printPopulationStat(world.getPopulationStat("country", countryPop));
-                    break;
-                case 19:
-                    System.out.print("Enter continent name (e.g. Asia): ");
-                    String cont = scanner.nextLine();
-                    System.out.print("Enter N (number of cities to show): ");
-                    int n1 = Integer.parseInt(scanner.nextLine());
-                    printCapitalCities(world.getTopNCapitalCities("continent", cont, n1));
-                    break;
-
-                case 20:
-                    System.out.print("Enter region name (e.g. Caribbean): ");
-                    String reg = scanner.nextLine();
-                    System.out.print("Enter N (number of cities to show): ");
-                    int n2 = Integer.parseInt(scanner.nextLine());
-                    printCapitalCities(world.getTopNCapitalCities("region", reg, n2));
-                    break;
-
 
                 case 0:
                     // Clean exit
@@ -248,7 +260,6 @@ public class App {
 
         System.out.println("\nTotal results: " + countries.size());
     }
-
     // Repeatedly prompts user until a valid integer is entered
     private static int getInt(Scanner scanner) {
         while (!scanner.hasNextInt()) {
@@ -268,25 +279,4 @@ public class App {
         }
         return list.subList(0, n);
     }
-
-    private static void printPopulationStat(List<PopulationStat> list) {
-        System.out.printf("%-20s %-15s %-15s %-15s%n",
-                "Name", "Total", "In Cities", "Not In Cities");
-        System.out.println("-------------------------------------------------------------------");
-
-        for (PopulationStat p : list) {
-            System.out.printf("%-20s %-15d %-15d %-15d%n",
-                    p.name, p.total, p.inCities, p.notInCities);
-        }
-    }
-    private static void printCapitalCities(List<City> capitals) {
-        System.out.printf("%-25s %-25s %-15s%n", "City", "Country", "Population");
-        System.out.println("--------------------------------------------------------------");
-
-        for (City c : capitals) {
-            System.out.printf("%-25s %-25s %-15d%n", c.getName(), c.getCountryCode(), c.getPopulation());
-        }
-    }
-
-
 }
