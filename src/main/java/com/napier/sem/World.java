@@ -121,6 +121,12 @@ public class World {
                 params = new Object[]{ value };
                 break;
 
+            case "district":
+                sql = "SELECT city.* FROM city " +
+                        "WHERE city.District = ? ORDER BY city.Population DESC";
+                params = new Object[]{ value };
+                break;
+
             default:
                 System.err.println("Invalid type: " + type);
                 return new ArrayList<>();

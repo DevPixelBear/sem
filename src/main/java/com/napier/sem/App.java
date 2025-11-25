@@ -28,6 +28,9 @@ public class App {
             System.out.println("10. Top N populated cities in a region");
             System.out.println("11. All cities in the world");
             System.out.println("12. All cities in a country");
+            System.out.println("13. All cities in a region");
+            System.out.println("14. All cities in a district");
+            System.out.println("15. All cities in a continent");
             System.out.println("0. Exit");
             System.out.print("Enter your choice: ");
 
@@ -125,11 +128,33 @@ public class App {
                     break;
 
                 case 12:
-                    // Display all countries in the world, in no particular order
+                    // Display all cities in a city
                     System.out.print("Enter a country name: ");
-                    String userInput = scanner.nextLine();
-                    showCities(world.getCities("country", userInput));
+                    String countryUserInput = scanner.nextLine();
+                    showCities(world.getCities("country", countryUserInput));
                     break;
+
+                case 13:
+                    //display all cities in a region
+                    System.out.print("Enter a region: ");
+                    String regionUserInput = scanner.nextLine();
+                    showCities(world.getCities("region", regionUserInput));
+                    break;
+
+                case 14:
+                    //display all cities in a district
+                    System.out.print("Enter a district: ");
+                    String districtUserInput = scanner.nextLine();
+                    showCities(world.getCities("district", districtUserInput));
+                    break;
+
+                case 15:
+                    //display all cities in a continent
+                    System.out.print("Enter a continent: ");
+                    String continentUserInput = scanner.nextLine();
+                    showCities(world.getCities("continent", continentUserInput));
+                    break;
+
 
                 case 0:
                     // Clean exit
