@@ -34,6 +34,8 @@ public class App {
             System.out.println("16. Population of people in each continent (total, in cities, not in cities)");
             System.out.println("17. Population of people in each region (total, in cities, not in cities)");
             System.out.println("18. Population of people in each country (total, in cities, not in cities)");
+            System.out.println("19. Top N capital cities in a continent");
+            System.out.println("20. Top N capital cities in a region");
             System.out.println("0. Exit");
             System.out.print("Enter your choice: ");
 
@@ -177,6 +179,21 @@ public class App {
                     String countryPop = scanner.nextLine();
                     printPopulationStat(world.getPopulationStat("country", countryPop));
                     break;
+                case 19:
+                    System.out.print("Enter continent name (e.g. Asia): ");
+                    String cont = scanner.nextLine();
+                    System.out.print("Enter N (number of cities to show): ");
+                    int n1 = Integer.parseInt(scanner.nextLine());
+                    printCapitalCities(world.getTopNCapitalCities("continent", cont, n1));
+                    break;
+
+                case 20:
+                    System.out.print("Enter region name (e.g. Caribbean): ");
+                    String reg = scanner.nextLine();
+                    System.out.print("Enter N (number of cities to show): ");
+                    int n2 = Integer.parseInt(scanner.nextLine());
+                    printCapitalCities(world.getTopNCapitalCities("region", reg, n2));
+                    break;
 
 
                 case 0:
@@ -262,5 +279,14 @@ public class App {
                     p.name, p.total, p.inCities, p.notInCities);
         }
     }
+    private static void printCapitalCities(List<City> capitals) {
+        System.out.printf("%-25s %-25s %-15s%n", "City", "Country", "Population");
+        System.out.println("--------------------------------------------------------------");
+
+        for (City c : capitals) {
+            System.out.printf("%-25s %-25s %-15d%n", c.getName(), c.getCountryCode(), c.getPopulation());
+        }
+    }
+
 
 }
