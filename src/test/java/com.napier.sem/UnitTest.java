@@ -47,5 +47,31 @@ public class UnitTest {
         List<Country> limited = App.limitList(null, 2);
         assertNull(limited); // should return null if input list is null
     }
+
+    //test for city class
+    @Test
+    void testingCityGetters() {
+        City city = new City(1, "London", "GBR", "England", 9000000);
+
+        assertEquals(1, city.getID());
+        assertEquals("London", city.getName());
+        assertEquals("GBR", city.getCountryCode());
+        assertEquals("England", city.getDistrict());
+        assertEquals(9000000, city.getPopulation());
+    }
+
+    //tests for country class
+    @Test
+    void testingCountryGetters() {
+        Country c = new Country("United Kingdom", "GBR", "Europe", "British Isles", 67000000);
+
+        assertEquals("United Kingdom", c.getName());
+        assertEquals("GBR", c.getCode());
+        assertEquals("Europe", c.getContinent());
+        assertEquals("British Isles", c.getRegion());
+        assertEquals(67000000, c.getPopulation());
+    }
+
 }
+
 
