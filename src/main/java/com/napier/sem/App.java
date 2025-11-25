@@ -31,6 +31,9 @@ public class App {
             System.out.println("13. All cities in a region");
             System.out.println("14. All cities in a district");
             System.out.println("15. All cities in a continent");
+            System.out.println("16. Population of people in each continent (total, in cities, not in cities)");
+            System.out.println("17. Population of people in each region (total, in cities, not in cities)");
+            System.out.println("18. Population of people in each country (total, in cities, not in cities)");
             System.out.println("0. Exit");
             System.out.print("Enter your choice: ");
 
@@ -154,6 +157,26 @@ public class App {
                     String continentUserInput = scanner.nextLine();
                     showCities(world.getCities("continent", continentUserInput));
                     break;
+                case 16:
+                    // Population by continent (chosen by user)
+                    System.out.print("Enter continent name (e.g. Asia): ");
+                    String contPop = scanner.nextLine();
+                    printPopulationStat(world.getPopulationStat("continent", contPop));
+                    break;
+
+                case 17:
+                    // Population by region (chosen by user)
+                    System.out.print("Enter region name (e.g. Caribbean): ");
+                    String regPop = scanner.nextLine();
+                    printPopulationStat(world.getPopulationStat("region", regPop));
+                    break;
+
+                case 18:
+                    // Population by country (chosen by user)
+                    System.out.print("Enter country name (e.g. France): ");
+                    String countryPop = scanner.nextLine();
+                    printPopulationStat(world.getPopulationStat("country", countryPop));
+                    break;
 
 
                 case 0:
@@ -228,4 +251,16 @@ public class App {
         }
         return list.subList(0, n);
     }
+
+    private static void printPopulationStat(List<PopulationStat> list) {
+        System.out.printf("%-20s %-15s %-15s %-15s%n",
+                "Name", "Total", "In Cities", "Not In Cities");
+        System.out.println("-------------------------------------------------------------------");
+
+        for (PopulationStat p : list) {
+            System.out.printf("%-20s %-15d %-15d %-15d%n",
+                    p.name, p.total, p.inCities, p.notInCities);
+        }
+    }
+
 }
