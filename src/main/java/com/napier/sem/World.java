@@ -142,6 +142,62 @@ public class World {
         }
     }
 
+    public List<City> getTopNCapitalCities(String type, String value, int n) {
+        String sql;
+        Object[] params;
+
+        switch (type.toLowerCase()) {
+            case "continent":
+                sql = "SELECT city.ID, city.Name, country.Name AS CountryName, city.District, city.Population " +
+                        "FROM city " +
+                        "JOIN country ON country.Capital = city.ID " +
+                        "WHERE country.Continent = ? " +
+                        "ORDER BY city.Population DESC " +
+                        "LIMIT ?";
+                params = new Object[]{ value, n };
+                break;
+
+            case "region":
+                sql = "SELECT city.ID, city.Name, country.Name AS CountryName, city.District, city.Population " +
+                        "FROM city " +
+                        "JOIN country ON country.Capital = city.ID " +
+                        "WHERE country.Region = ? " +
+                        "ORDER BY city.Population DESC " +
+                        "LIMIT ?";
+                params = new Object[]{ value, n };
+                break;
+
+            default:
+                System.err.println("Invalid type: " + type);
+                return new ArrayList<>();
+        }
+
+        List<City> list = new ArrayList<>();
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            for (int i = 0; i < params.length; i++) {
+                stmt.setObject(i + 1, params[i]);
+            }
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    list.add(new City(
+                            rs.getInt("ID"),
+                            rs.getString("Name"),
+                            rs.getString("CountryName"),  // use countryCode field to store country name
+                            rs.getString("District"),
+                            rs.getInt("Population")
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Query failed: " + e.getMessage());
+        }
+
+        return list;
+    }
+
+
 
     public List<Country> getCountries(String type, String value) {
         String sql;
@@ -191,6 +247,75 @@ public class World {
 
         return cities;
     }
+
+    public List<PopulationStat> getPopulationStat(String type, String value) {
+        String sql = "";
+
+        switch (type.toLowerCase()) {
+
+            case "continent":
+                sql =
+                        "SELECT c.Continent AS Name, " +
+                                "SUM(c.Population) AS TotalPopulation, " +
+                                "SUM(ci.Population) AS CityPopulation, " +
+                                "(SUM(c.Population) - SUM(ci.Population)) AS NonCityPopulation " +
+                                "FROM country c " +
+                                "LEFT JOIN city ci ON ci.CountryCode = c.Code " +
+                                "WHERE c.Continent = ? " +
+                                "GROUP BY c.Continent";
+                break;
+
+            case "region":
+                sql =
+                        "SELECT c.Region AS Name, " +
+                                "SUM(c.Population) AS TotalPopulation, " +
+                                "SUM(ci.Population) AS CityPopulation, " +
+                                "(SUM(c.Population) - SUM(ci.Population)) AS NonCityPopulation " +
+                                "FROM country c " +
+                                "LEFT JOIN city ci ON ci.CountryCode = c.Code " +
+                                "WHERE c.Region = ? " +
+                                "GROUP BY c.Region";
+                break;
+
+            case "country":
+                sql =
+                        "SELECT c.Name AS Name, " +
+                                "c.Population AS TotalPopulation, " +
+                                "(SELECT SUM(ci.Population) FROM city ci WHERE ci.CountryCode = c.Code) AS CityPopulation, " +
+                                "(c.Population - (SELECT SUM(ci.Population) FROM city ci WHERE ci.CountryCode = c.Code)) AS NonCityPopulation " +
+                                "FROM country c " +
+                                "WHERE c.Name = ?";
+                break;
+
+            default:
+                System.err.println("Invalid type: " + type);
+                return new ArrayList<>();
+        }
+
+        List<PopulationStat> list = new ArrayList<>();
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            stmt.setString(1, value);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    list.add(new PopulationStat(
+                            rs.getString("Name"),
+                            rs.getLong("TotalPopulation"),
+                            rs.getLong("CityPopulation"),
+                            rs.getLong("NonCityPopulation")
+                    ));
+                }
+            }
+        }
+        catch (SQLException e) {
+            System.err.println("Query failed: " + e.getMessage());
+        }
+
+        return list;
+    }
+
 
 
 
