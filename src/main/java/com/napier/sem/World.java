@@ -49,16 +49,19 @@ public class World {
         }
     }
 
+    // Public method for accessing city data specifically
     public List<City> getCities(String type, String value) {
         String sql;
         Object[] params;
 
         switch (type.toLowerCase()) {
+            // Query for all cities in the world organised by largest population to smallest
             case "world":
                 sql = "SELECT * FROM city ORDER BY Population DESC";
                 params = new Object[]{};
                 break;
 
+            // Query for all cities in a continent organised by largest population to smallest
             case "continent":
                 sql = "SELECT city.* FROM city " +
                         "JOIN country ON city.CountryCode = country.Code " +
@@ -66,6 +69,7 @@ public class World {
                 params = new Object[]{ value };
                 break;
 
+            // Query for all cities in a region organised by largest population to smallest
             case "region":
                 sql = "SELECT city.* FROM city " +
                         "JOIN country ON city.CountryCode = country.Code " +
@@ -73,6 +77,7 @@ public class World {
                 params = new Object[]{ value };
                 break;
 
+            // Query for all the cities in a country organised by largest population to smallest
             case "country":
                 sql = "SELECT city.* FROM city " +
                         "JOIN country ON city.CountryCode = country.Code " +
@@ -80,44 +85,51 @@ public class World {
                 params = new Object[]{ value };
                 break;
 
+            // Query for all the cities in a district organised by largest population to smallest
             case "district":
                 sql = "SELECT city.* FROM city " +
                         "WHERE city.District = ? ORDER BY city.Population DESC";
                 params = new Object[]{ value };
                 break;
 
+            // Default return empty list with an error message
             default:
                 System.err.println("Invalid type: " + type);
                 return new ArrayList<>();
         }
 
         try {
+            // Run query and return results
             ResultSet resultset = runQuery(sql, params);
             return buildCities(resultset);
         }
         catch (SQLException e) {
+            // Print error message if query fails
             System.err.println("Query failed: " + e.getMessage());
             return new ArrayList<>();
         }
     }
 
+    // Public method for accessing data for all capital cities specifically
     public List<City> getTopNCapitalCities(String type, String value, int n) {
         String sql;
         Object[] params;
 
         switch (type.toLowerCase()) {
+            // Query for all capital cities in the world organised by largest population to smallest
             case "continent":
-                sql = "SELECT city.ID, city.Name, country.Name AS CountryName, city.District, city.Population " +
+                sql = "SELECT city.ID, city.Name, city.CountryCode, city.District, city.Population " +
                         "FROM city " +
                         "JOIN country ON country.Capital = city.ID " +
                         "WHERE country.Continent = ? " +
                         "ORDER BY city.Population DESC " +
-                        "LIMIT ?";
+                        "LIMIT ?" ;
                 params = new Object[]{ value, n };
                 break;
 
+            // Query for all capital cities in a continent organised by largest population to smallest
             case "region":
-                sql = "SELECT city.ID, city.Name, country.Name AS CountryName, city.District, city.Population " +
+                sql = "SELECT city.ID, city.Name, city.CountryCode, city.District, city.Population " +
                         "FROM city " +
                         "JOIN country ON country.Capital = city.ID " +
                         "WHERE country.Region = ? " +
@@ -126,18 +138,22 @@ public class World {
                 params = new Object[]{ value, n };
                 break;
 
+            // Default return empty list with an error message
             default:
                 System.err.println("Invalid type: " + type);
                 return new ArrayList<>();
         }
 
+        // Array list to store results
         List<City> list = new ArrayList<>();
 
+        // Connect to database if not already connected
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             for (int i = 0; i < params.length; i++) {
                 stmt.setObject(i + 1, params[i]);
             }
 
+            // Execute query and store results in list
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     list.add(new City(
@@ -149,6 +165,7 @@ public class World {
                     ));
                 }
             }
+        // Catch any SQL errors
         } catch (SQLException e) {
             System.err.println("Query failed: " + e.getMessage());
         }
@@ -157,29 +174,34 @@ public class World {
     }
 
 
-
+    // Public method for accessing country data specifically
     public List<Country> getCountries(String type, String value) {
         String sql;
         Object[] params;
 
         switch (type.toLowerCase()) {
+            // Query for all countries in the world organised by largest population to smallest
             case "world":
                 sql = "SELECT Code, Name, Continent, Region, Population " +
                         "FROM country ORDER BY Population DESC";
                 params = new Object[]{};
                 break;
 
+            // Query for all countries in a continent organised by largest population to smallest
             case "continent":
                 sql = "SELECT Code, Name, Continent, Region, Population " +
                         "FROM country WHERE Continent = ? ORDER BY Population DESC";
                 params = new Object[]{ value };
                 break;
 
+            // Query for all countries in a region organised by largest population to smallest
             case "region":
                 sql = "SELECT Code, Name, Continent, Region, Population " +
                         "FROM country WHERE Region = ? ORDER BY Population DESC";
                 params = new Object[]{ value };
                 break;
+
+            // Query for all capital cities in a country organised by largest population to smallest
             case "capital":
                 sql = """
             SELECT city.* FROM city
@@ -189,6 +211,7 @@ public class World {
                 params = new Object[]{ value };
                 break;
 
+            // Default return empty list with an error message
             default:
                 System.err.println("Invalid type: " + type);
                 return new ArrayList<>();
@@ -197,8 +220,10 @@ public class World {
         return runCountryQuery(sql, params);
     }
 
+    // Helper method to build City objects from ResultSet
     public List<City> buildCities (ResultSet rs) throws SQLException {
 
+        // Create an array list to store cities
         List<City> cities = new ArrayList<>();
         while (rs.next()) {
             cities.add(new City(
@@ -361,11 +386,13 @@ public class World {
     }
 
 
+    // Public method for accessing population statistics specifically
     public List<PopulationStat> getPopulationStat(String type, String value) {
         String sql = "";
 
         switch (type.toLowerCase()) {
 
+            // Query for accessing population statistics for each continent
             case "continent":
                 sql =
                         "SELECT c.Continent AS Name, " +
@@ -378,6 +405,7 @@ public class World {
                                 "GROUP BY c.Continent";
                 break;
 
+            // Query for accessing population statistics for each region
             case "region":
                 sql =
                         "SELECT c.Region AS Name, " +
@@ -390,6 +418,7 @@ public class World {
                                 "GROUP BY c.Region";
                 break;
 
+            // Query for accessing population statistics for each country
             case "country":
                 sql =
                         "SELECT c.Name AS Name, " +
@@ -400,17 +429,21 @@ public class World {
                                 "WHERE c.Name = ?";
                 break;
 
+            // Default return empty list with an error message
             default:
                 System.err.println("Invalid type: " + type);
                 return new ArrayList<>();
         }
 
+        // Array list to store results
         List<PopulationStat> list = new ArrayList<>();
 
+        // Connect to database if not already connected
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
 
             stmt.setString(1, value);
 
+            // Execute query and store results in list
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     list.add(new PopulationStat(
@@ -422,6 +455,7 @@ public class World {
                 }
             }
         }
+        // Catch any SQL errors
         catch (SQLException e) {
             System.err.println("Query failed: " + e.getMessage());
         }
